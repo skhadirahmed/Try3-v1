@@ -62,34 +62,47 @@ public class LeftPlaylist extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MainActivity.LEFT_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
+
+                Toast.makeText(this, "onActivityResult of LeftPlaylist", Toast.LENGTH_SHORT).show();
                 //show selected song on the left playlist activity
-                String song_name = data.getStringExtra("song_name");
-                String artist = data.getStringExtra("artist");
-                String song_data = data.getStringExtra("data");
+//                String song_name = data.getStringExtra("song_name");
+//                String artist = data.getStringExtra("artist");
+//                String song_data = data.getStringExtra("data");
 
-                data_all[i] = song_data;
-                Log.v("LeftPlaylist", "data_all at index " + i + " from getData() is " + data_all[i]);
-                i++;
+//                data_all[i] = song_data;
+//                Log.v("LeftPlaylist", "data_all at index " + i + " from getData() is " + data_all[i]);
+//                i++;
 
-                Toast.makeText(this, "song selected " + song_name + "\nartist " + artist, Toast.LENGTH_SHORT).show();
-
-                ContentValues values = new ContentValues();
-                values.put(DataBaseHelper.COL_SONG_NAME, song_name);
-                values.put(DataBaseHelper.COL_ARTIST, artist);
-                values.put(DataBaseHelper.COL_DATA, song_data);
-
-                long id = dataBaseHelper.insertIntoDataBase(values);
+//                Toast.makeText(this, "song selected " + song_name + "\nartist " + artist, Toast.LENGTH_SHORT).show();
+//
+//                ContentValues values = new ContentValues();
+//                values.put(DataBaseHelper.COL_SONG_NAME, song_name);
+//                values.put(DataBaseHelper.COL_ARTIST, artist);
+//                values.put(DataBaseHelper.COL_DATA, song_data);
+//i commented the below lines 81 and 84
+//                long id = dataBaseHelper.insertIntoDataBase(values);
 
                 //todo write a insertIntoDataBase for atleast one song to be preloaded
-                Log.v("MyPlaylist", "value of id inserted is " + id);
+//                Log.v("MyPlaylist", "value of id inserted is " + id);
                 //todo i added the below two lines
 
 //                updatePlaylist(song_name, artist);//todo i commented this line
-                setResult(RESULT_OK);
-                intent.putExtra("data_all", data_all);
-                finish();
+                boolean selected_a_song = data.getBooleanExtra("selected_a_song", false);
+                Log.v("LeftPlaylist", "selected_a_song value is " + selected_a_song);
+                if (selected_a_song) {
+                    Toast.makeText(this, "song selected", Toast.LENGTH_SHORT).show();
+                    myUpdate();
+                    setResult(RESULT_OK);
+                    intent.putExtra("data_all", data_all);
+                    finish();
+                } else {
+                    Toast.makeText(this, "no song selected", Toast.LENGTH_SHORT).show();
+                    finish();//no song selected
+                }
+
             }
         }
+
         if (requestCode == MainActivity.RIGHT_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 //show selected song in the right playlist activity
@@ -161,6 +174,11 @@ public class LeftPlaylist extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Toast.makeText(this, "onResume in activity_left_playlist", Toast.LENGTH_SHORT).show();
+        myUpdate();
+    }
+
+
+    public void myUpdate() {
         Cursor cursor = dataBaseHelper.getAllData();
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -170,7 +188,6 @@ public class LeftPlaylist extends AppCompatActivity {
             } while (cursor.moveToNext());
         }
     }
-
 
     public void sendNotification() {
         builder.setContentTitle(songname);

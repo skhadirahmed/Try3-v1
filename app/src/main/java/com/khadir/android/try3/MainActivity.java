@@ -72,11 +72,25 @@ public class MainActivity extends AppCompatActivity
         Rstop = findViewById(R.id.RightStop);
         RalbumArt = findViewById(R.id.RightAlbumArt);
         LeftMediaPlayer.setVolume(1, 0);
+        LeftMediaPlayer.setOnCompletionListener(this);
         RightMediaPlayer.setVolume(0, 1);
         if (LeftMediaPlayer.isPlaying()) {
             Lplay.setImageResource(R.drawable.ic_pause);
             LEFT_PLAY_PAUSE = PAUSE;
         }
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
+        data_all = dataBaseHelper.getDataArray();
+
+        if (data_all[0] != null) {
+            try {
+                String d = data_all[song_playing_number];
+                LeftMediaPlayer.setDataSource(d);
+                LeftMediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -167,22 +181,26 @@ public class MainActivity extends AppCompatActivity
             case R.id.LeftPlay:
                 if (LEFT_PLAY_PAUSE == PLAY) {
                     Lplay.setImageResource(R.drawable.ic_pause);
-                    if (!LeftMediaPlayer.isPlaying()) {
-//                        try {
-                        Log.v("LeftPlay", "trying to play playlist");
-//                            playPlaylist();
-                        for (int i = 0; i < 100; i++) {
-                            String data = sharedPreferences.getString("" + i, "default");
-                            Log.v("MainActivity", "shared preferences value at " + i + " is " + data);
-                        }
-//                        }
+//                    if (LeftMediaPlayer.isPlaying()) {
 //                        LeftMediaPlayer.start();
+//                    }
+                    if (!LeftMediaPlayer.isPlaying()) {
+
+                        LeftMediaPlayer.start();
+//                        LeftMediaPlayer.seekTo(200000);
+//                        Log.v("LeftPlay", "trying to play playlist");
+//                        for (int i = 0; i < 100; i++) {
+//                            String data = sharedPreferences.getString("" + i, "default");
+//                            Log.v("MainActivity", "shared preferences value at " + i + " is " + data);
+//                        }
+                    } else if (LeftMediaPlayer.isPlaying()) {
+                        LeftMediaPlayer.start();
                     }
-//                    Toast.makeText(this, "play", Toast.LENGTH_SHORT).show();
                     LEFT_PLAY_PAUSE = 1;
                 } else {
                     Lplay.setImageResource(R.drawable.ic_play_arrow);
                     LeftMediaPlayer.pause();
+
                     Toast.makeText(this, "pause", Toast.LENGTH_SHORT).show();
                     LEFT_PLAY_PAUSE = 0;
                 }
@@ -277,9 +295,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        song_playing_number++;
         mp.reset();
-        Toast.makeText(this, "completed to play the song number " + song_playing_number, Toast.LENGTH_SHORT).show();
-        song_playing_number = song_playing_number + 1;
+        try {
+            mp.setDataSource(data_all[song_playing_number]);
+            mp.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mp.start();
+//        mp.seekTo(200000);
     }
 
 

@@ -18,8 +18,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static final String COL_SONG_NAME = "song_name";
     public static final String COL_ARTIST = "artist";
     public static final String COL_DATA = "data";
+    public static final String COL_ALBUM_ART = "album_art";
 
-    public static final String CREATE_QUERY = "create table " + TABLE_NAME + "(" + COL_ID + " integer primary key autoincrement," + COL_SONG_NAME + " text," + COL_ARTIST + " text," + COL_DATA + " text" + ");";
+    public static final String CREATE_QUERY = "create table " + TABLE_NAME + "(" + COL_ID + " integer primary key autoincrement," + COL_SONG_NAME + " text," + COL_ARTIST + " text," + COL_DATA + " text," + COL_ALBUM_ART + " text" + ");";
 
     SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 
