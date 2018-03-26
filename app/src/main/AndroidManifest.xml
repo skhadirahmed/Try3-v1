@@ -30,7 +30,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".RightPlaylist"
-            android:label="right playlist"
+            android:label="Right playlist"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
