@@ -15,11 +15,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:text="select your song to add to playlist"
+        android:text="@string/select_your_song_to_add_to_playlist"
         android:textSize="20sp" />
 
     <ListView
         android:id="@+id/listview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:scrollbarSize="50dp" />
 </LinearLayout>

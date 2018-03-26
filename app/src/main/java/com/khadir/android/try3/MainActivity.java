@@ -59,10 +59,10 @@ public class MainActivity extends AppCompatActivity
                 seekUpdation();
             }
         };
-        if (LeftMediaPlayer.isPlaying()) {
-            int mFileDuration = LeftMediaPlayer.getDuration();
-            LeftSeekBar.setMax(mFileDuration); // where mFileDuration is mMediaPlayer.getDuration();
-        }
+//        if (LeftMediaPlayer.isPlaying()) {
+//            int mFileDuration = LeftMediaPlayer.getDuration();
+//            LeftSeekBar.setMax(mFileDuration); // where mFileDuration is mMediaPlayer.getDuration();
+//        }
 
         Lplay = findViewById(R.id.LeftPlay);
         Lstop = findViewById(R.id.LeftStop);

@@ -2,6 +2,7 @@ package com.khadir.android.try3;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ public class AllMusic extends AppCompatActivity {
     public String song_name, artist;
     String player = "", data = "";
     Intent intent;
+    String path = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,22 +33,41 @@ public class AllMusic extends AppCompatActivity {
         listView = findViewById(R.id.listview);
         final ArrayList<MusicDetails> musicDetails = new ArrayList<>();
         //TODO Query all the songs using getContentResolver().query()
-        String projection[] = {MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.DATA};
-        cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, null, null, MediaStore.Audio.Media.DISPLAY_NAME);
+
+        Uri uri_for_album_art = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+        Uri uri_for_songs = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String projection[] = {MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.ALBUM};
+
+        String p[] = {MediaStore.Audio.Albums.ALBUM_ART, MediaStore.Audio.Albums.ALBUM};
+        String selection = MediaStore.Audio.Albums.ALBUM + "=?";
+
+        cursor = getContentResolver().query(uri_for_songs, projection, null, null, MediaStore.Audio.Media.ALBUM_KEY);
         if (cursor != null) {
             cursor.moveToFirst();
         }
         do {
+            String song_album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
+            Log.v("AllMusic", "song album is  " + song_album);
+
+            Cursor album_art_cursor = getContentResolver().query(uri_for_album_art, p, selection, new String[]{String.valueOf(song_album)}, null);
+
+            if (album_art_cursor != null && album_art_cursor.moveToFirst()) {
+                Log.v("AllMusic", "album art cursor is not null");
+                path = album_art_cursor.getString(album_art_cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+                Log.v("AllMusic", "path to album art is " + path);
+                album_art_cursor.close();
+            }
+
             song_name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
             Log.v("song_name", "" + song_name);
             artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
             Log.v("artist", "" + artist);
-//            String album_art = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ART));
-//            Log.v("Album Art", "" + album_art);
             data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
             Log.v("String from data", data);
-            musicDetails.add(new MusicDetails(song_name, artist,data));
+            musicDetails.add(new MusicDetails(song_name, artist, data, path));
         } while (cursor.moveToNext());
+
         //TODO iterate through the returned Cursor object and populate the musicDetails ArrayList
 
         MusicDetailsAdapter musicDetailsAdapter = new MusicDetailsAdapter(this, musicDetails);
@@ -59,6 +80,8 @@ public class AllMusic extends AppCompatActivity {
                 MusicDetails musicDetails1 = musicDetails.get(position);
 //                Toast.makeText(AllMusic.this, "song name is " + musicDetails1.getSong_name(), Toast.LENGTH_SHORT).show();
                 if (player.equals("left")) {
+                    //todo instead of sending back the selected music data and inserting in the database from LeftPlaylist.java insert from here and just get data from db in LeftPlaylist
+
                     intent = new Intent(AllMusic.this, LeftPlaylist.class);
                 } else if (player.equals("right")) {
                     intent = new Intent(AllMusic.this, RightPlaylist.class);
@@ -69,7 +92,7 @@ public class AllMusic extends AppCompatActivity {
                 // TODO (we will have two databases one for each person with options to delete,update,etc)
                 intent.putExtra("song_name", musicDetails1.getSong_name());
                 intent.putExtra("artist", musicDetails1.getArtist());
-                intent.putExtra("data",musicDetails1.getData());
+                intent.putExtra("data", musicDetails1.getData());
                 setResult(RESULT_OK, intent);
                 finish();
             }
