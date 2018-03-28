@@ -7,6 +7,9 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
@@ -130,6 +133,10 @@ public class LeftPlaylist extends AppCompatActivity {
                 Toast.makeText(LeftPlaylist.this, "Playing the song " + song_name, Toast.LENGTH_SHORT).show();
                 sendNotification();
                 String data = dataBaseHelper.getData(song_name);
+                String path = dataBaseHelper.getColAlbumArt(song_name);
+//                Bitmap bitmap = BitmapFactory.decodeFile(path);
+                Drawable drawable = Drawable.createFromPath(path);
+                MainActivity.LalbumArt.setBackground(drawable);
                 Log.v("LeftPlaylist", "data from getData() is " + data);
                 if (MainActivity.LeftMediaPlayer.isPlaying()) {
                     //Clear the media player object for the next song

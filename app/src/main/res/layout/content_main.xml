@@ -43,15 +43,27 @@
                 android:onClick="onClick"
                 android:src="@drawable/ic_stop" />
 
-            <ImageView
+            <android.support.v7.widget.CardView
                 android:id="@+id/LeftAlbumArt"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="35dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:onClick="onClick"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@mipmap/ic_launcher"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="@dimen/cardview_default_elevation">
+
+                <TextView
+                    android:id="@+id/song_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="20dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
+            </android.support.v7.widget.CardView>
 
         </LinearLayout>
 
@@ -94,7 +106,7 @@
                 android:onClick="onClick"
                 android:src="@drawable/ic_stop" />
 
-            <ImageView
+            <android.support.v7.widget.CardView
                 android:id="@+id/RightAlbumArt"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

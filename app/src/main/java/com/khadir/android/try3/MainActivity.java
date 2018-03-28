@@ -1,12 +1,19 @@
 package com.khadir.android.try3;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -27,7 +34,10 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, MediaPlayer.OnCompletionListener {
 
-    ImageView Lplay, Lstop, Rplay, Rstop, LalbumArt, RalbumArt;
+    static ArrayList<MusicDetails> musicDetails = new ArrayList<>();
+
+    static ImageView Lplay, Lstop, Rplay, Rstop;
+    static CardView LalbumArt, RalbumArt;
     SeekBar LeftSeekBar;
     private static int PLAY = 0;
     private static int PAUSE = 1;
@@ -37,12 +47,15 @@ public class MainActivity extends AppCompatActivity
     public static int RIGHT_REQUEST_CODE = 905;
     public static MediaPlayer LeftMediaPlayer = new MediaPlayer();
     public static MediaPlayer RightMediaPlayer = new MediaPlayer();
-    String data_all[] = new String[100];
+    String data_all[], data_all_album_art[] = new String[100];
+    boolean isReady;
     Handler seekHandler;
     Runnable runnable;
     int song_playing_number = 0;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +91,30 @@ public class MainActivity extends AppCompatActivity
             Lplay.setImageResource(R.drawable.ic_pause);
             LEFT_PLAY_PAUSE = PAUSE;
         }
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading");
+        progressDialog.setMessage("please wait while your data is loading");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIcon(R.drawable.ic_audiotrack);
+        progressDialog.show();
+
+        //i am calling get ready
+        isReady = getReady();
+        for (int i = 0; i < musicDetails.size(); i++) {
+            Log.v("music details", "songname " + musicDetails.get(i).getSong_name());
+            Log.v("music details", "artist " + musicDetails.get(i).getArtist());
+        }
         DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
         data_all = dataBaseHelper.getDataArray();
+        data_all_album_art = dataBaseHelper.getDataArrayAlbumArt();
 
-        if (data_all[0] != null) {
+        if (data_all[0] != null && data_all_album_art[0] != null) {
             try {
                 String d = data_all[song_playing_number];
                 LeftMediaPlayer.setDataSource(d);
+                Drawable drawable = Drawable.createFromPath(data_all_album_art[0]);
+                LalbumArt.setBackground(drawable);
                 LeftMediaPlayer.prepare();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -214,6 +244,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.LeftAlbumArt:
                 Toast.makeText(this, "Clicked on Left Album Art", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, LeftPlaylist.class);
+//                intent.putStringArrayListExtra("data_of_all_songs",new ArrayList<String>());
                 startActivityForResult(intent, LEFT_REQUEST_CODE);
                 break;
             case R.id.RightPlay:
@@ -283,6 +314,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        if (isReady) {
+            progressDialog.dismiss();
+        }
         if (LeftMediaPlayer.isPlaying()) {
             Lplay.setImageResource(R.drawable.ic_pause);
             LEFT_PLAY_PAUSE = PAUSE;
@@ -299,6 +333,8 @@ public class MainActivity extends AppCompatActivity
         mp.reset();
         try {
             mp.setDataSource(data_all[song_playing_number]);
+            Drawable drawable = Drawable.createFromPath(data_all_album_art[song_playing_number]);
+            LalbumArt.setBackground(drawable);
             mp.prepare();
         } catch (IOException e) {
             e.printStackTrace();
@@ -322,4 +358,44 @@ public class MainActivity extends AppCompatActivity
 //        }
 //    });
 
+    public boolean getReady() {
+        Cursor cursor;
+        String path = "", song_name, artist, data;
+        Uri uri_for_album_art = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+        Uri uri_for_songs = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String projection[] = {MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.ALBUM};
+
+        String p[] = {MediaStore.Audio.Albums.ALBUM_ART, MediaStore.Audio.Albums.ALBUM};
+        String selection = MediaStore.Audio.Albums.ALBUM + "=?";
+
+        cursor = getContentResolver().query(uri_for_songs, projection, null, null, MediaStore.Audio.Media.ALBUM_KEY);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        do {
+            String song_album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
+            Log.v("AllMusic", "song album is  " + song_album);
+
+            Cursor album_art_cursor = getContentResolver().query(uri_for_album_art, p, selection, new String[]{String.valueOf(song_album)}, null);
+
+            if (album_art_cursor != null && album_art_cursor.moveToFirst()) {
+                Log.v("AllMusic", "album art cursor is not null");
+                path = album_art_cursor.getString(album_art_cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+                Log.v("AllMusic", "path to album art is " + path);
+                album_art_cursor.close();
+            }
+
+            song_name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+            Log.v("song_name", "" + song_name);
+            artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+            Log.v("artist", "" + artist);
+            data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+            Log.v("String from data", data);
+            musicDetails.add(new MusicDetails(song_name, artist, data, path));
+        } while (cursor.moveToNext());
+
+        cursor.close();
+        return true;
+    }
 }

@@ -20,6 +20,14 @@ import java.util.ArrayList;
 
 public class MusicDetailsAdapter extends ArrayAdapter<MusicDetails> {
 
+    String aa;
+    Bitmap bitmap;
+
+    static class ViewHolder {
+        public TextView song_name, artist;
+        public ImageView album_art;
+    }
+
     public MusicDetailsAdapter(@NonNull Context context, ArrayList<MusicDetails> musicDetails) {
         super(context, 0, musicDetails);
     }
@@ -31,23 +39,31 @@ public class MusicDetailsAdapter extends ArrayAdapter<MusicDetails> {
         if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext())
                     .inflate(R.layout.single_music_item, parent, false);
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.song_name = listItemView.findViewById(R.id.song_name);
+            viewHolder.artist = listItemView.findViewById(R.id.artist);
+            viewHolder.album_art = listItemView.findViewById(R.id.album_art);
+
+            listItemView.setTag(viewHolder);
         }
+
+        ViewHolder holder = (ViewHolder) listItemView.getTag();
 
         MusicDetails currentMusicDetails = getItem(position);
 
-        TextView song_name = listItemView.findViewById(R.id.song_name);
-        song_name.setText(currentMusicDetails.getSong_name());
+//        song_name = listItemView.findViewById(R.id.song_name);
+        holder.song_name.setText(currentMusicDetails.getSong_name());
 
-        TextView artist = listItemView.findViewById(R.id.artist);
-        artist.setText(currentMusicDetails.getArtist());
+//        artist = listItemView.findViewById(R.id.artist);
+        holder.artist.setText(currentMusicDetails.getArtist());
 
-        ImageView album_art = listItemView.findViewById(R.id.album_art);
-        String aa = currentMusicDetails.getAlbum_art();
+//        album_art = listItemView.findViewById(R.id.album_art);
+        aa = currentMusicDetails.getAlbum_art();
         if (aa != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(aa);
-            album_art.setImageBitmap(bitmap);
+            bitmap = BitmapFactory.decodeFile(aa);
+            holder.album_art.setImageBitmap(bitmap);
         } else {
-            album_art.setImageResource(R.drawable.ic_music_note_black_24dp);
+            holder.album_art.setImageResource(R.drawable.ic_music_note_black_24dp);
         }
 
         return listItemView;

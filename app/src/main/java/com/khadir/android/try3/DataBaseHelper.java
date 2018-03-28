@@ -61,7 +61,24 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             data = cursor.getString(cursor.getColumnIndexOrThrow(COL_DATA));
             Log.v("getData", "data form the cursor is " + data);
         }
+        cursor.close();
         return data;
+    }
+
+    public String getColAlbumArt(String song_name) {
+        String query = "select " + COL_ALBUM_ART + " from " + TABLE_NAME + " where " + COL_SONG_NAME + " =?";
+        String path = "";
+        String selection_args[] = {song_name};
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, selection_args);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            path = cursor.getString(cursor.getColumnIndexOrThrow(COL_ALBUM_ART));
+            Log.v("getColAlbumArt", "path form the cursor is " + path);
+        }
+        cursor.close();
+
+        return path;
     }
 
     public String[] getDataArray() {
@@ -76,7 +93,26 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 Log.v("getDataArray", "data number " + i + " is " + data);
                 data_all[i++] = data;
             } while (cursor.moveToNext());
+            cursor.close();
         }
+
         return data_all;
+    }
+
+    public String[] getDataArrayAlbumArt() {
+        String data_all_album_art[] = new String[100];//currently i support only upto 100 songs in a playlist
+        String query = "select " + COL_ALBUM_ART + " from " + TABLE_NAME;
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        int i = 0;
+        String data;
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                data = cursor.getString(cursor.getColumnIndexOrThrow(COL_ALBUM_ART));
+                data_all_album_art[i++] = data;
+            } while (cursor.moveToNext());
+            cursor.close();
+
+        }
+        return data_all_album_art;
     }
 }
