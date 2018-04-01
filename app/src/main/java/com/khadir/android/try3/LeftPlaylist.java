@@ -118,7 +118,12 @@ public class LeftPlaylist extends AppCompatActivity {
         l = new LinearLayout(this);
         l.setOrientation(LinearLayout.VERTICAL);
         final TextView s = new TextView(this);
-        s.setText(song_name);
+        String short_song = song_name;
+        if (song_name.length() > 20) {
+            short_song = song_name.substring(0, 16) + "...";
+        }
+//        s.setText(song_name);
+        s.setText(short_song);
         s.setTextSize(30);
 
 
@@ -166,8 +171,9 @@ public class LeftPlaylist extends AppCompatActivity {
         s.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                v.setVisibility(View.GONE);
-                a.setVisibility(View.GONE);
+//                v.setVisibility(View.GONE);
+//                a.setVisibility(View.GONE);
+                Toast.makeText(LeftPlaylist.this, song_name, Toast.LENGTH_SHORT).show();
                 //todo delete the removed views from the playlist database
                 return true;
             }
