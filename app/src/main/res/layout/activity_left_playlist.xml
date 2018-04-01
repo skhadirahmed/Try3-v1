@@ -9,11 +9,11 @@
     <!--here display the songs selected by the user
     the song details are first inserted into our database
     we retrieve these songs from our oun SQLite database -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/your_left_playlist"
-        android:textSize="20sp" />
+    <!--<TextView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="@string/your_left_playlist"-->
+    <!--android:textSize="20sp" />-->
 
     <ScrollView
         android:layout_width="match_parent"
