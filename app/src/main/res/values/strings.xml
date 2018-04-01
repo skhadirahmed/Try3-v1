@@ -8,4 +8,5 @@
     <string name="disply_album_art">disply album art</string>
     <string name="your_left_playlist">Your Left playlist</string>
     <string name="select_your_song_to_add_to_playlist">select your song to add to playlist</string>
+    <string name="your_right_playlist">Your Right Playlist</string>
 </resources>

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -87,22 +88,36 @@ public class AllMusic extends AppCompatActivity {
                 MusicDetails musicDetails1 = musicDetails.get(position);
                 selected_a_song = true;
 //                Toast.makeText(AllMusic.this, "song name is " + musicDetails1.getSong_name(), Toast.LENGTH_SHORT).show();
+
+                contentValues.put(DataBaseHelper.COL_SONG_NAME, musicDetails1.getSong_name());
+                contentValues.put(DataBaseHelper.COL_ARTIST, musicDetails1.getArtist());
+                contentValues.put(DataBaseHelper.COL_DATA, musicDetails1.getData());
+                contentValues.put(DataBaseHelper.COL_ALBUM_ART, musicDetails1.getAlbum_art());
+
                 if (player.equals("left")) {
                     //todo instead of sending back the selected music data and inserting in the database from LeftPlaylist.java insert from here and just get data from db in LeftPlaylist
-                    contentValues.put(DataBaseHelper.COL_SONG_NAME, musicDetails1.getSong_name());
-                    contentValues.put(DataBaseHelper.COL_ARTIST, musicDetails1.getArtist());
-                    contentValues.put(DataBaseHelper.COL_DATA, musicDetails1.getData());
-                    contentValues.put(DataBaseHelper.COL_ALBUM_ART, musicDetails1.getAlbum_art());
 
-                    long inserted_row_id = dataBaseHelper.insertIntoDataBase(contentValues);
-                    Log.v("AllMusic", "Inserted row id is " + inserted_row_id);
+                    contentValues.put(DataBaseHelper.COL_DIRECTION, player);
+
+//                    long inserted_row_id = dataBaseHelper.insertIntoDataBase(contentValues);
+//                    Log.v("AllMusic", "Inserted row id is " + inserted_row_id);
 
 //                    intent = new Intent(AllMusic.this, LeftPlaylist.class);
 
                     intent.putExtra("selected_a_song", selected_a_song);
+
                 } else if (player.equals("right")) {
-                    intent = new Intent(AllMusic.this, RightPlaylist.class);
+
+                    contentValues.put(DataBaseHelper.COL_DIRECTION, player);
+                    intent.putExtra("selected_a_song", selected_a_song);
+
+//                    long inserted_row_id = dataBaseHelper.insertIntoDataBase(contentValues);
+//                    Log.v("AllMusic", "Inserted row id is " + inserted_row_id);
+//                    intent = new Intent(AllMusic.this, RightPlaylist.class);
                 }
+
+                long inserted_row_id = dataBaseHelper.insertIntoDataBase(contentValues);
+                Log.v("AllMusic", "Inserted row id is " + inserted_row_id);
 
                 //TODO send selected song details to MyPlaylist.java to store them in the SQLite database
                 //TODO also implement a class to play the playlist by quering the playlist databse

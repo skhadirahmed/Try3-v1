@@ -27,6 +27,7 @@ import java.util.ArrayList;
 public class LeftPlaylist extends AppCompatActivity {
 
     DataBaseHelper dataBaseHelper;
+    String direction = DataBaseHelper.DIRECTION_LEFT;
     Intent intent = null;
     LinearLayout linearLayout;
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -106,11 +107,11 @@ public class LeftPlaylist extends AppCompatActivity {
             }
         }
 
-        if (requestCode == MainActivity.RIGHT_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                //show selected song in the right playlist activity
-            }
-        }
+//        if (requestCode == MainActivity.RIGHT_REQUEST_CODE) {
+//            if (resultCode == RESULT_OK) {
+//                //show selected song in the right playlist activity
+//            }
+//        }
     }
 
     public void updatePlaylist(final String song_name, final String artist) {
@@ -132,8 +133,8 @@ public class LeftPlaylist extends AppCompatActivity {
                 martist = artist;
                 Toast.makeText(LeftPlaylist.this, "Playing the song " + song_name, Toast.LENGTH_SHORT).show();
                 sendNotification();
-                String data = dataBaseHelper.getData(song_name);
-                String path = dataBaseHelper.getColAlbumArt(song_name);
+                String data = dataBaseHelper.getData(song_name, direction);
+                String path = dataBaseHelper.getColAlbumArt(song_name, direction);
 //                Bitmap bitmap = BitmapFactory.decodeFile(path);
                 Drawable drawable = Drawable.createFromPath(path);
                 MainActivity.LalbumArt.setBackground(drawable);
@@ -186,11 +187,11 @@ public class LeftPlaylist extends AppCompatActivity {
 
 
     public void myUpdate() {
-        Cursor cursor = dataBaseHelper.getAllData();
+        Cursor cursor = dataBaseHelper.getAllData(direction);
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                String song_name = cursor.getString(cursor.getColumnIndexOrThrow(dataBaseHelper.COL_SONG_NAME));
-                String artist = cursor.getString(cursor.getColumnIndexOrThrow(dataBaseHelper.COL_ARTIST));
+                String song_name = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseHelper.COL_SONG_NAME));
+                String artist = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseHelper.COL_ARTIST));
                 updatePlaylist(song_name, artist);
             } while (cursor.moveToNext());
         }
